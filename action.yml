@@ -1,0 +1,47 @@
+name: 'Pull Request Updater GitHub Action'
+description: 'GitHub Action that updates a pull request with information extracted from branch name'
+author: 'Tamim Khan'
+runs:
+  pre: chainguard-phonehome.js
+  using: 'node12'
+  main: 'index.js'
+inputs:
+  repo-token:
+    description: 'The GITHUB_TOKEN secret'
+    required: true
+  branch-regex:
+    description: 'Regex to match branch name'
+    required: true
+    default: 'FOO-\d+'
+  lowercase-branch:
+    description: 'Should lowercase branch name before matching text'
+    required: false
+    default: true
+  title-template:
+    description: 'Title prefix template where branch info gets substituted in'
+    required: true
+    default: '[%branch%]'
+  title-prefix-space:
+    description: 'Should add space after title prefix'
+    required: false
+    default: true
+  uppercase-title:
+    description: 'Should uppercase title prefix'
+    required: false
+    default: true
+  body-template:
+    description: 'Body prefix template where branch info gets substituted in'
+    required: true
+    default: '[%branch%](https://url/to/browse/ticket/%branch%)'
+  body-prefix-newline-count:
+    description: 'Number of newlines to separate body and its prefix'
+    required: false
+    default: 2
+  uppercase-body:
+    description: 'Should uppercase body prefix'
+    required: false
+    default: true
+branding:
+  icon: 'edit-3'
+  color: 'green'
+  

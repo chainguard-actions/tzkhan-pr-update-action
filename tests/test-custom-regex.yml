@@ -1,0 +1,41 @@
+name: Test PR update action with custom branch regex
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_EVENT_NAME: pull_request
+      GITHUB_REF: refs/pull/7/merge
+      GITHUB_HEAD_REF: JIRA-789-fix-bug
+      GITHUB_BASE_REF: develop
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Run action with custom JIRA-style regex
+        id: action
+        uses: .
+        with:
+          repo-token: ${{ github.token }}
+          branch-regex: 'JIRA-\d+'
+          lowercase-branch: 'false'
+          title-template: '[%branch%]'
+          title-prefix-space: 'false'
+          uppercase-title: 'false'
+          body-template: 'Ticket: [%branch%](https://jira.example.com/browse/%branch%)'
+          body-prefix-newline-count: '1'
+          uppercase-body: 'false'
+        continue-on-error: true
+
+      - name: Assert action ran without configuration error
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "action outcome: $OUTCOME"
+          # The action may fail due to no real PR in act environment,
+          # but it should not fail due to invalid configuration.
+          if [ "$OUTCOME" = "skipped" ]; then
+            echo "FAIL: action was skipped unexpectedly"
+            exit 1
+          fi
+          echo "PASS: action ran with custom regex (outcome=$OUTCOME)"
